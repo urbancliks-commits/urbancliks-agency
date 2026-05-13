@@ -1,8 +1,13 @@
-import "dotenv/config";
-import { PrismaClient } from "../app/generated/prisma";
+import { config } from "dotenv";
+config({ path: ".env.local" });
+config({ path: ".env" });
+
+import { PrismaClient } from "../app/generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { scryptSync, randomBytes } from "crypto";
 
-const db = new PrismaClient();
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+const db = new PrismaClient({ adapter });
 
 function hashPassword(password: string): string {
   const salt = randomBytes(16).toString("hex");
